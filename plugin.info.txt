@@ -1,0 +1,7 @@
+base   imagecdn
+author john doe
+email  johndoe@example.com
+date   2020-11-30
+name   imagecdn plugin
+desc   replace image with imagecdn url
+url    https://github.com/kabbala/dokuwiki-plugin-imagecdn/
