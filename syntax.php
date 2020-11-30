@@ -73,8 +73,16 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
 
             $match = '/'.$match;
         }
+        
+        if ($this->getConf('use_fetch')==1) {
+ 
+            $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, $this->getConf('fetch_param'), true) . '">';
+         
+        } else {
+        
+            $data[0] = '<img src="' . $this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix') . '">';
 
-        $data[0] = '<img src="'.$this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix').'">';    // I want to use fetch.php. but I don't know how to.
+        } 
 
         return $data;
     }
