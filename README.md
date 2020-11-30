@@ -1,5 +1,7 @@
 # dokuwiki-plugin-imagecdn
-replace media file with remote url
+replace media file with remote url.
+
+dokuwiki plugin type: Syntax.
 
 ## feature
 
