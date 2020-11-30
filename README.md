@@ -9,3 +9,4 @@ replace media file with remote url
 * make to work like normal `{{image file}}` using `fetch.php`
 * support `float` rendering with spaces.
 * obey ACL. even no effect in remote cdn.
+* `namespace` option(include/exclude)
