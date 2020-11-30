@@ -7,5 +7,5 @@ replace media file with remote url
 
 ## todo
 * make to work like normal `{{image file}}` using `fetch.php`
-* support 'float' rendering with spaces.
+* support `float` rendering with spaces.
 * obey ACL. even no effect in remote cdn.
