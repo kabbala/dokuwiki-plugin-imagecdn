@@ -12,3 +12,6 @@ dokuwiki plugin type: Syntax.
 * support `float` rendering with spaces.
 * obey ACL. even no effect in remote cdn.
 * `namespace` option(include/exclude)
+
+## note
+* If you don't need to use DokuWiki's Media Manager, Using **InterWiki** function is good choice to link remote image. like `[[imagecdn>foo/bar.jpg]]`
