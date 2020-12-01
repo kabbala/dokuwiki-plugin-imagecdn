@@ -43,14 +43,9 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
      */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('\{\{:[a-z0-9:_]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
-//        $this->Lexer->addEntryPattern('<FIXME>', $mode, 'plugin_imagecdn');
-    }
+        $this->Lexer->addSpecialPattern('\{\{:[a-zA-Z0-9:_]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
 
-//    public function postConnect()
-//    {
-//        $this->Lexer->addExitPattern('</FIXME>', 'plugin_imagecdn');
-//    }
+    }
 
     /**
      * Handle matches of the imagecdn syntax
@@ -76,7 +71,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
         
         if ($this->getConf('use_fetch')==1) {
  
-            $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, $this->getConf('fetch_param'), true) . '">';
+            $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, array('cache' => 'nocache'), true) . '">';
          
         } else {
         
