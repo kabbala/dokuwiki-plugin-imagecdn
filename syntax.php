@@ -43,7 +43,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
      */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('\{\{:[a-zA-Z0-9:_]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
+        $this->Lexer->addSpecialPattern('\{\{:[a-zA-Z0-9:_\-]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
 
     }
 
