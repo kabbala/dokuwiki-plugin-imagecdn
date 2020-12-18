@@ -5,45 +5,29 @@
  * https://github.com/kabbala/dokuwiki-plugin-imagecdn/
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
+if (!defined('DOKU_INC')) { die(); }
 
 class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
 {
-    /**
-     * @return string Syntax mode type
-     */
+
     public function getType()
     {
         return 'substition';
     }
 
-    /**
-     * @return string Paragraph type
-     */
     public function getPType()
     {
         return 'normal';
     }
 
-    /**
-     * @return int Sort order - Low numbers go before high numbers
-     */
     public function getSort()
     {
         return 319;    // just before Doku_Parser_Mode_media(320)
     }
 
-    /**
-     * Connect lookup pattern to lexer.
-     *
-     * @param string $mode Parser mode
-     */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('\{\{:[a-zA-Z0-9:_\-]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
+        $this->Lexer->addSpecialPattern("\{\{:[a-z0-9:_\-]+.(?:jpg|gif|png)\}\}", $mode, 'plugin_imagecdn');
 
     }
 
@@ -60,26 +44,31 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
     
-        if (!$this->getConf('imagecdn_url')) {return;}
+        if (!trim($this->getConf('imagecdn_url'))) {return;}
         
-        $match = str_replace(':', '/', substr($match,3,-2));
+        $params = Doku_Handler_Parse_Media($match);
         
-        if (substr($this->getConf('imagecdn_url'),-1,1)!='/') {
+        if ($params['type'] == 'internalmedia')
+        {
+            $match = str_replace(':', '/', substr($match,3,-2));
 
-            $match = '/'.$match;
-        }
-        
-        if ($this->getConf('use_fetch')==1) {
+            if (substr($this->getConf('imagecdn_url'),-1,1)!='/') { $match = '/'.$match; }
+
+            if ($this->getConf('use_fetch')==1) {
  
-            $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, array('cache' => 'nocache'), true) . '">';
+                $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, array('cache' => 'nocache'), true) . '">';
          
-        } else {
+            } else {
         
-            $data[0] = '<img src="' . $this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix') . '">';
+                $data[0] = '<img src="' . $this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix') . '">';
 
-        } 
+            } 
 
+        }
+        else {return;}
+        
         return $data;
+         
     }
 
     /**
@@ -94,7 +83,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
     public function render($mode, Doku_Renderer $renderer, $data)
     {
 
-        if (!$this->getConf('imagecdn_url')) {return;}
+        if (!trim($this->getConf('imagecdn_url'))) {return;}
 
         if ($mode !== 'xhtml') {
             return false;
