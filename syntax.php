@@ -44,28 +44,34 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
     
-        if (!trim($this->getConf('imagecdn_url'))) {return;}
-        
         $params = Doku_Handler_Parse_Media($match);
-        
-        if ($params['type'] == 'internalmedia')
+    
+        if (!($params['type'] == 'internalmedia'))
         {
-            $match = str_replace(':', '/', substr($match,3,-2));
-
-            if (substr($this->getConf('imagecdn_url'),-1,1)!='/') { $match = '/'.$match; }
-
-            if ($this->getConf('use_fetch')==1) {
- 
-                $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, array('cache' => 'nocache'), true) . '">';
-         
-            } else {
-        
-                $data[0] = '<img src="' . $this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix') . '">';
-
-            } 
+            // no rendering. error.
+            $data[0] = $params['src'];
+            
+        }
+        elseif (!trim($this->getConf('imagecdn_url')))
+        {
+            // same as normal internalmedia
+            $data[0] = '<img src="' . ml($params['src']) . '" debug="2">';
 
         }
-        else {return;}
+        elseif ($this->getConf('use_fetch')==0)
+        {
+            // direct link image without using fetch.php
+            $match = str_replace(':', '/', substr($match,3,-2));
+            $data[0] = '<img src="' . trim($this->getConf('imagecdn_url')).$match.'?'.trim($this->getConf('imagecdn_url_suffix')) . '" debug="3">';
+
+        }
+        else
+        {
+            // convert link
+            $match = str_replace(':', '/', substr($match,3,-2));
+            $data[0] = '<img src="' . ml(trim($this->getConf('imagecdn_url')).$match, array('cache' => 'nocache'), true) . '" debug="4">';
+    
+        }
         
         return $data;
          
