@@ -27,8 +27,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
 
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern("\{\{:[a-z0-9:_\-]+.(?:jpg|gif|png)\}\}", $mode, 'plugin_imagecdn');
-
+        $this->Lexer->addSpecialPattern("\{\{:[a-z0-9:_\-]+.(?:jpg|gif|png)(?:\?[a-z0-9&=]*)?\}\}", $mode, 'plugin_imagecdn');
     }
 
     /**
@@ -44,33 +43,29 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
     
-        $params = Doku_Handler_Parse_Media($match);
+        $data = Doku_Handler_Parse_Media($match);
     
-        if (!($params['type'] == 'internalmedia'))
+        if (!($data['type'] == 'internalmedia'))
         {
             // no rendering. error.
-            $data[0] = $params['src'];
-            
         }
         elseif (!trim($this->getConf('imagecdn_url')))
         {
             // same as normal internalmedia
-            $data[0] = '<img src="' . ml($params['src']) . '" debug="2">';
-
         }
         elseif ($this->getConf('use_fetch')==0)
         {
             // direct link image without using fetch.php
             $match = str_replace(':', '/', substr($match,3,-2));
-            $data[0] = '<img src="' . trim($this->getConf('imagecdn_url')).$match.'?'.trim($this->getConf('imagecdn_url_suffix')) . '" debug="3">';
+            $data[0] = '<img src="' . trim($this->getConf('imagecdn_url')).$match . '">';
 
         }
         else
         {
             // convert link
-            $match = str_replace(':', '/', substr($match,3,-2));
-            $data[0] = '<img src="' . ml(trim($this->getConf('imagecdn_url')).$match, array('cache' => 'nocache'), true) . '" debug="4">';
-    
+            $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
+            $data = Doku_Handler_Parse_Media($match);
+            $data['cache'] = 'nocache';
         }
         
         return $data;
@@ -88,17 +83,29 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
      */
     public function render($mode, Doku_Renderer $renderer, $data)
     {
-
-        if (!trim($this->getConf('imagecdn_url'))) {return;}
-
         if ($mode !== 'xhtml') {
             return false;
         }
 
-        $renderer->doc .= $data[0];
+        if ($data['type']=='internalmedia' && !trim($this->getConf('imagecdn_url')))
+        {
+            $renderer->internalmedia($data['src'], $data['title'], $data['align'], $data['width'], $data['height'], $data['cache'], $data['linking'], false);
+
+        }
+        elseif ($data['type']=='externalmedia' && trim($this->getConf('imagecdn_url')) && $this->getConf('use_fetch')==1)
+        {
+            $renderer->doc .= $renderer->externalmedia($data['src'], $data['title'], $data['align'], $data['width'], $data['height'], $data['cache'], $data['linking'], false);
+        }
+        elseif ($data['type']=='internalmedia' && trim($this->getConf('imagecdn_url')) && $this->getConf('use_fetch')==0) 
+        {
+            $renderer->doc .= $data[0];
+        }
+        else
+        {
+        $renderer->doc .= $data['src'];    // error
+        }
 
         return true;
 
     }
 }
-
