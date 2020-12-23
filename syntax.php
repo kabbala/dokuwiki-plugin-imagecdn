@@ -5,46 +5,29 @@
  * https://github.com/kabbala/dokuwiki-plugin-imagecdn/
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
+if (!defined('DOKU_INC')) { die(); }
 
 class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
 {
-    /**
-     * @return string Syntax mode type
-     */
+
     public function getType()
     {
         return 'substition';
     }
 
-    /**
-     * @return string Paragraph type
-     */
     public function getPType()
     {
         return 'normal';
     }
 
-    /**
-     * @return int Sort order - Low numbers go before high numbers
-     */
     public function getSort()
     {
         return 319;    // just before Doku_Parser_Mode_media(320)
     }
 
-    /**
-     * Connect lookup pattern to lexer.
-     *
-     * @param string $mode Parser mode
-     */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('\{\{:[a-zA-Z0-9:_\-]+.(?:jpg|gif|png)\}\}', $mode, 'plugin_imagecdn');
-
+        $this->Lexer->addSpecialPattern("\{\{:[a-z0-9:_\-]+.(?:jpg|gif|png)(?:\?[a-z0-9&=]*)?\}\}", $mode, 'plugin_imagecdn');
     }
 
     /**
@@ -60,26 +43,47 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
     
-        if (!$this->getConf('imagecdn_url')) {return;}
-        
-        $match = str_replace(':', '/', substr($match,3,-2));
-        
-        if (substr($this->getConf('imagecdn_url'),-1,1)!='/') {
+        $data = Doku_Handler_Parse_Media($match);
+    
+        if (!($data['type'] == 'internalmedia'))
+        {
+            // no rendering. error.
+        }
+        elseif (!trim($this->getConf('imagecdn_url')))
+        {
+            // same as normal internalmedia
+        }
+        elseif ($this->getConf('use_fetch')==0)
+        {
+            // direct link image without using fetch.php
+            $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
+            $data = Doku_Handler_Parse_Media($match);
+            $match = substr($match, 0, strrpos($match, '?'));
+            if ($data['width']>0 && $data['height']>0)
+            {
+                $style = 'style="width: ' . $data['width'] . 'px; height: ' . $data['height'] . 'px;"';
+            }
+            elseif ($data['width']>0)
+            {
+                $style = 'style="width: ' . $data['width'] . 'px; height: auto;"';
+            }
+            elseif ($data['height']>0)
+            {
+                $style = 'style="width: auto; height: ' . $data['height'] . 'px;"';
+            }
+            $data[0] = '<img src="' . $match . '" ' . $style . '>';
 
-            $match = '/'.$match;
+        }
+        else
+        {
+            // convert link
+            $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
+            $data = Doku_Handler_Parse_Media($match);
+            $data['cache'] = 'nocache';
         }
         
-        if ($this->getConf('use_fetch')==1) {
- 
-            $data[0] = '<img src="' . ml($this->getConf('imagecdn_url').$match, array('cache' => 'nocache'), true) . '">';
-         
-        } else {
-        
-            $data[0] = '<img src="' . $this->getConf('imagecdn_url').$match.'?'.$this->getConf('imagecdn_url_suffix') . '">';
-
-        } 
-
         return $data;
+         
     }
 
     /**
@@ -93,17 +97,29 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
      */
     public function render($mode, Doku_Renderer $renderer, $data)
     {
-
-        if (!$this->getConf('imagecdn_url')) {return;}
-
         if ($mode !== 'xhtml') {
             return false;
         }
 
-        $renderer->doc .= $data[0];
+        if ($data['type']=='internalmedia' && !trim($this->getConf('imagecdn_url')))
+        {
+            $renderer->internalmedia($data['src'], $data['title'], $data['align'], $data['width'], $data['height'], $data['cache'], $data['linking'], false);
+
+        }
+        elseif ($data['type']=='externalmedia' && trim($this->getConf('imagecdn_url')) && $this->getConf('use_fetch')==1)
+        {
+            $renderer->doc .= $renderer->externalmedia($data['src'], $data['title'], $data['align'], $data['width'], $data['height'], $data['cache'], $data['linking'], false);
+        }
+        elseif ($data['type']=='externalmedia' && trim($this->getConf('imagecdn_url')) && $this->getConf('use_fetch')==0) 
+        {
+            $renderer->doc .= $data[0];
+        }
+        else
+        {
+        $renderer->doc .= $data['src'];    // error
+        }
 
         return true;
 
     }
 }
-
