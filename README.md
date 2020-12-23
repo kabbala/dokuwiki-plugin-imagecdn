@@ -12,6 +12,7 @@ dokuwiki plugin type: Syntax.
 * plugin:Move does not recognize image tag.
 
 ## todo
+* align(float) support in external mode.
 * obey ACL. even if no effect in remote cdn.
 * `namespace` option(include/exclude)
 * UTF8 character?
