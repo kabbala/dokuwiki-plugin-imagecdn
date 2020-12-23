@@ -59,6 +59,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
             $data = Doku_Handler_Parse_Media($match);
             $match = substr($match, 0, strrpos($match, '?'));
+            
             if ($data['width']>0 && $data['height']>0)
             {
                 $style = 'style="width: ' . $data['width'] . 'px; height: ' . $data['height'] . 'px;"';
@@ -71,7 +72,10 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             {
                 $style = 'style="width: auto; height: ' . $data['height'] . 'px;"';
             }
-            $data[0] = '<img src="' . $match . '" ' . $style . '>';
+            
+            if ($data['title']) { $title = 'title="' . $data['title'] . '"'; }
+
+            $data[0] = '<img src="' . $match . '" ' . $style . ' ' . $title . '>';
 
         }
         else
@@ -80,6 +84,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
             $data = Doku_Handler_Parse_Media($match);
             $data['cache'] = 'nocache';
+            if ($data['linking'] == 'detail') { $data['linking'] = 'nolink'; }
         }
         
         return $data;
