@@ -84,7 +84,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             $match = trim($this->getConf('imagecdn_url')).str_replace(':', '/', substr($match,3,-2));
             $data = Doku_Handler_Parse_Media($match);
             $data['cache'] = 'nocache';
-            if ($data['linking'] == 'detail') { $data['linking'] = 'nolink'; }
+            if ($data['linking'] == 'details' or !$data['linking']) { $data['linking'] = 'nolink'; }
         }
         
         return $data;
