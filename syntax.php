@@ -87,7 +87,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             if ($this->getConf('default_nolink')==1)
             {
                 // there is typo, detail and details.
-                if $data['linking'] == 'details' or $data['linking'] == 'detail' or !$data['linking']) { $data['linking'] = 'nolink'; }
+                if ($data['linking'] == 'details' or $data['linking'] == 'detail' or !$data['linking']) { $data['linking'] = 'nolink'; }
             } 
         }
         
