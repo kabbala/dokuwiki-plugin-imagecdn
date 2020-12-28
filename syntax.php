@@ -52,6 +52,11 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
         elseif (!trim($this->getConf('imagecdn_url')))
         {
             // same as normal internalmedia
+
+            if ($this->getConf('default_nolink')==1)
+            {
+                $data['linking'] = 'nolink';
+            }
         }
         elseif ($this->getConf('use_fetch')==0)
         {
@@ -86,8 +91,7 @@ class syntax_plugin_imagecdn extends DokuWiki_Syntax_Plugin
             $data['cache'] = 'nocache';
             if ($this->getConf('default_nolink')==1)
             {
-                // there is typo, detail and details.
-                if ($data['linking'] == 'details' or $data['linking'] == 'detail' or !$data['linking']) { $data['linking'] = 'nolink'; }
+                    $data['linking'] = 'nolink';
             } 
         }
         
