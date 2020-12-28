@@ -1,11 +1,11 @@
 # Plugin:Imagecdn
-replace media file with remote url.
+change media links to external CDN URLs to reduce traffic.
 
-dokuwiki plugin type: Syntax.
+plugin type: Syntax.
 
 ## feature
 
-* currently only supports absolute pagename begins with colon(`:`). `{{:foo:bar:baz.(jpg|png)}}` -> `<img src="http://imagecdn.example.com/dokuwiki_media_mirror/foo/bar/baz.(jpg|png)">`
+* only supports absolute pagename begins with colon(`:`). `{{:foo:bar:baz.(jpg|png)}}`
 
 ## problem
 
