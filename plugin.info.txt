@@ -1,7 +1,7 @@
 base   imagecdn
 author Atom Lee
 email  kabbala@users.noreply.github.com
-date   2020-11-30
-name   imagecdn plugin
-desc   replace image with imagecdn url
+date   2020-12-29
+name   ImageCDN Plugin
+desc   change media links to external CDN urls.
 url    https://github.com/kabbala/dokuwiki-plugin-imagecdn/
